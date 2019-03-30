@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/positron-net/Charge/issues"
   },
-  "homepage": "https://github.com/positron-net/Charge#readme"
+  "homepage": "https://github.com/positron-net/Charge#readme",
+  "dependencies": {
+    "lz4": "^0.6.0"
+  }
 }
