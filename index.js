@@ -14,7 +14,7 @@ module.exports = () => {
     log: require('./modules/log.js'),
     receiver: require('./modules/receiver.js'),
     sender: require('./modules/sender.js'),
-    discover: require('./modules/discover.js')
+    agora: require('./modules/agora.js')
   }
 
   modules.log.info('Charge, initiated !')
