@@ -1,8 +1,10 @@
 const fs =require('fs')
-const lz4 = require('lz4')
+const snappy = require('snappy')
+
+const log = require('./log.js')
 
 const files = {
-  split (buffer) {
+  split (buffer, peers) {
     return new Promise(resolve => {
       data = this.compress(buffer)
   
@@ -11,7 +13,11 @@ const files = {
       let result = []
 
       while (i < data.length) {
-        let buffer = data.slice(i, i += 6400)
+        let buffer = data.slice(i, i += data.length / peers)
+
+        if (buffer > 64000) {
+          console.log('nope', buffer.length)
+        }
 
         let fileData = {
           id: part,
@@ -19,7 +25,6 @@ const files = {
         }
 
         result.push(fileData)
-
         part++
       }
 
@@ -35,26 +40,55 @@ const files = {
         file.push(buffers[i].buffer)
       }
       
-      resolve(this.decompress(Buffer.concat(file)))
+      resolve(Buffer.concat(file))
     })
   },
 
   read (path) {
-    return fs.readFileSync(path)
+    return new Promise((resolve, reject) => {
+      fs.readFile(path, (err, data) => {
+        if (err) {
+          log.error(err)
+          reject(err)
+        } else {
+          resolve(data)
+        }
+      })
+    })
   },
 
   write (path, buffer) {
-    fs.writeFile(path, buffer, err => {
-      if (err) throw err;
+    return new Promise((resolve, reject) => {
+      fs.writeFile(path, buffer, err => {
+        if (err) {
+          log.error(err)
+          reject(err)
+        } else {
+          resolve(data)
+        }
+      })
     })
   },
 
   compress (buffer) {
+    // return snappy.compressSync(buffer)
+    // return zlib.deflateSync(buffer)
     return lz4.encode(buffer)
   },
 
   decompress (buffer) {
+    // return zlib.inflateSync(buffer)
     return lz4.decode(buffer)
+    /*
+    const isValid = snappy.isValidCompressedSync(buffer)
+    
+    if (isValid) {
+      return snappy.uncompressSync(buffer)
+    } else {
+      log.error('The compressed buffer is not valid !')
+      return 'error'
+    }
+    */
   }
 }
 
