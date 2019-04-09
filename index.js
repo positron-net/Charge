@@ -1,22 +1,7 @@
-module.exports = () => {
-
-  console.log(`
-      ____             _ __                 
-     / __ \\____  _____(_) /__________  ____ 
-    / /_/ / __ \\/ ___/ / __/ ___/ __ \\/ __ \\
-   / ____/ /_/ (__  ) / /_/ /  / /_/ / / / /
-  /_/    \\____/____/_/\\__/_/   \\____/_/ /_/ 
-
-  `)
-
-  const modules = {
-    files: require('./modules/files.js'),
-    log: require('./modules/log.js'),
-    receiver: require('./modules/receiver.js'),
-    sender: require('./modules/sender.js'),
-    agora: require('./modules/agora.js')
-  }
-
-  modules.log.info('Charge, initiated !')
-  return modules
+module.exports = {
+  files: require('./modules/files.js'),
+  log: require('./modules/log.js'),
+  receiver: require('./modules/receiver.js'),
+  sender: require('./modules/sender.js'),
+  agora: require('./modules/agora.js')
 }
