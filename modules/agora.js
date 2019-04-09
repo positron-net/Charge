@@ -1,10 +1,22 @@
 const dgram = require('dgram')
 const socket = dgram.createSocket('udp4')
 
+const EventEmitter = require('events')
+const reponce = new EventEmitter()
+
 const server = {
   address: '127.0.0.1',
   port: 2112
 }
+
+socket.on('message', (res, remote) => {
+  res = Buffer.from(res).toString()
+  res = JSON.parse(res)
+
+  console.log('[AGORA] > Message received !')
+
+  reponce.emit('message', res)
+})
 
 const agora = {
   send (action, content) {
@@ -18,12 +30,21 @@ const agora = {
 
     socket.send(message, 0, message.length, server.port, server.address, (err, bytes) => {
       if (err) throw err
+      console.log('[AGORA] > Message sent !')
     })
   },
 
   connect (token) {
-    this.send('CONNECT', {
-      token: token
+    return new Promise(resolve => {
+      this.send('CONNECT', {
+        token: token
+      })
+
+      reponce.on('message', (res) => {
+        if (res.responce === 'CONNECT') {
+          resolve(res.message)
+        }
+      })
     })
   },
 
@@ -32,7 +53,12 @@ const agora = {
       this.send('GET_IP', {
         token: token
       })
-      resolve()
+
+      reponce.on('message', (res) => {
+        if (res.responce === 'GET_IP') {
+          resolve(res.message)
+        }
+      })
     })
   },
   
