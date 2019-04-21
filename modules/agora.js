@@ -5,7 +5,7 @@ const EventEmitter = require('events')
 const reponce = new EventEmitter()
 
 const server = {
-  address: '127.0.0.1',
+  address: 'shuttleapp.io',
   port: 2112
 }
 
@@ -41,8 +41,8 @@ const agora = {
       })
 
       reponce.on('message', (res) => {
-        if (res.responce === 'CONNECT') {
-          resolve(res.message)
+        if (res.message === 'CONNECT') {
+          resolve(res.content)
         }
       })
     })
@@ -55,8 +55,8 @@ const agora = {
       })
 
       reponce.on('message', (res) => {
-        if (res.responce === 'GET_IP') {
-          resolve(res.message)
+        if (res.message === 'GET_IP') {
+          resolve(res.content)
         }
       })
     })
