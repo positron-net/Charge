@@ -2,10 +2,10 @@ const dgram = require('dgram')
 const socket = dgram.createSocket('udp4')
 
 const EventEmitter = require('events')
-const reponce = new EventEmitter()
+const response = new EventEmitter()
 
 const server = {
-  address: 'shuttleapp.io',
+  address: '127.0.0.1',
   port: 2112
 }
 
@@ -14,8 +14,7 @@ socket.on('message', (res, remote) => {
   res = JSON.parse(res)
 
   console.log('[AGORA] > Message received !')
-
-  reponce.emit('message', res)
+  response.emit('message', res)
 })
 
 const agora = {
@@ -40,8 +39,8 @@ const agora = {
         token: token
       })
 
-      reponce.on('message', (res) => {
-        if (res.message === 'CONNECT') {
+      response.on('message', (res) => {
+        if (res.response === 'CONNECT') {
           resolve(res.content)
         }
       })
@@ -54,8 +53,8 @@ const agora = {
         token: token
       })
 
-      reponce.on('message', (res) => {
-        if (res.message === 'GET_IP') {
+      response.on('message', (res) => {
+        if (res.response === 'GET_IP') {
           resolve(res.content)
         }
       })
@@ -68,9 +67,17 @@ const agora = {
     })
   },
   
-  getRandomClient(amount) {
+  getRandomPeers (amount) {
     return new Promise((resolve, reject) => {
-      
+      this.send('GET_PEERS', {
+        number: amount
+      })
+
+      response.on('message', (res) => {
+        if (res.response === 'GET_PEERS') {
+          resolve(res.message)
+        }
+      })
     })
   },
   
