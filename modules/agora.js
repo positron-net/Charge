@@ -1,3 +1,4 @@
+const snappy = require('snappy')
 const dgram = require('dgram')
 const socket = dgram.createSocket('udp4')
 
@@ -10,11 +11,18 @@ const server = {
 }
 
 socket.on('message', (res, remote) => {
-  res = Buffer.from(res).toString()
-  res = JSON.parse(res)
+  snappy.uncompress(res, { asBuffer: false }, (err, result) => {
 
-  console.log('[AGORA] > Message received !')
-  response.emit('message', res)
+    if (err) {
+      return
+    }
+
+    result = Buffer.from(result).toString()
+    result = JSON.parse(result)
+  
+    console.log('[AGORA] > Message received !')
+    response.emit('message', result)
+  })
 })
 
 const agora = {
@@ -27,9 +35,11 @@ const agora = {
     message = JSON.stringify(message)
     message = Buffer.from(message)
 
-    socket.send(message, 0, message.length, server.port, server.address, (err, bytes) => {
-      if (err) throw err
-      console.log('[AGORA] > Message sent !')
+    snappy.compress(message, (err, msg) => {
+      socket.send(msg, 0, msg.length, server.port, server.address, (err, bytes) => {
+        if (err) throw err
+        console.log('[AGORA] > Message sent !')
+      })
     })
   },
 
