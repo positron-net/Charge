@@ -6,7 +6,7 @@ const EventEmitter = require('events')
 const response = new EventEmitter()
 
 const server = {
-  address: '127.0.0.1',
+  address: 'localhost',
   port: 2112
 }
 
@@ -43,10 +43,11 @@ const agora = {
     })
   },
 
-  connect (token) {
+  connect (token, port) {
     return new Promise(resolve => {
       this.send('CONNECT', {
-        token: token
+        token: token,
+        port: port
       })
 
       response.on('message', (res) => {
