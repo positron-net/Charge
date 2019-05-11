@@ -6,7 +6,7 @@ const EventEmitter = require('events')
 const response = new EventEmitter()
 
 const server = {
-  address: 'localhost',
+  address: 'shuttleapp.io',
   port: 2112
 }
 
