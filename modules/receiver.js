@@ -1,3 +1,5 @@
+const log = require('./log.js')
+
 const dgram = require('dgram')
 const socket = dgram.createSocket('udp4')
 
@@ -6,6 +8,11 @@ const events = new EventEmitter()
 
 module.exports = (remoteAddress, port) => {
   socket.bind(port, remoteAddress)
+
+  socket.on('error', err => {
+    log.error(err)
+    server.close()
+  })
 
   socket.on('message', (message, remote) => {
 
