@@ -1,41 +1,49 @@
-const snappy = require('snappy')
-const dgram = require('dgram')
-const socket = dgram.createSocket('udp4')
+const snappy = require('snappy') // import snappy lib
+const dgram = require('dgram') // import dgram lib
+const socket = dgram.createSocket('udp4') // initialize udp socket with ip V4
 
-const EventEmitter = require('events')
-const response = new EventEmitter()
+const EventEmitter = require('events') // create an event listener
+const response = new EventEmitter() // initialize listener
 
+// server for developpement
 const server = {
   address: 'shuttleapp.io',
   port: 2112
 }
 
+// Message receiver
 socket.on('message', (res, remote) => {
+  // decompress message
   snappy.uncompress(res, { asBuffer: false }, (err, result) => {
 
     if (err) {
       return
     }
 
-    result = Buffer.from(result).toString()
-    result = JSON.parse(result)
+    result = Buffer.from(result).toString() // Stringify message
+    result = JSON.parse(result) // Parse JSON
   
     console.log('[AGORA] > Message received !')
-    response.emit('message', result)
+    response.emit('message', result) // Return messages
   })
 })
 
 const agora = {
+  // Function to send a message to an agora server
   send (action, content) {
+
+    // Store message contents on this object
     let message = {
       action: action,
       content: content
     }
 
-    message = JSON.stringify(message)
-    message = Buffer.from(message)
+    message = JSON.stringify(message) // Stringify JSON
+    message = Buffer.from(message) // Transform to buffer
 
+    // Compress message
     snappy.compress(message, (err, msg) => {
+      // Send message
       socket.send(msg, 0, msg.length, server.port, server.address, (err, bytes) => {
         if (err) throw err
         console.log('[AGORA] > Message sent !')
@@ -43,64 +51,73 @@ const agora = {
     })
   },
 
+  // Connect to an agora server
   connect (token, port) {
     return new Promise(resolve => {
+      // Send "CONNECT" message with token and port of the client to the Agora
       this.send('CONNECT', {
         token: token,
         port: port
       })
 
+      // When the client receive a message
       response.on('message', (res) => {
+        // if response is equal to "CONNECT"
         if (res.response === 'CONNECT') {
-          resolve(res.content)
+          resolve(res.content) // return content
         }
       })
     })
   },
 
+  // The goal of this function is to get the IP adress with the client' token
   getIp (token) {
     return new Promise((resolve, reject) => {
+      // Send "GET_IP" action to the Agora
       this.send('GET_IP', {
         token: token
       })
 
+      // When the client receive a message
       response.on('message', (res) => {
+        // if response is equal to "GET_IP"
         if (res.response === 'GET_IP') {
-          resolve(res.content)
+          resolve(res.content) // return content
         }
       })
     })
   },
-  
-  openListener (token) {
-    return new Promise((resolve, reject) => {
 
-    })
-  },
-  
+  // Get random client IP adresses
   getRandomPeers (amount) {
     return new Promise((resolve, reject) => {
+      // Send "GET_PEERS" action to the Agora
       this.send('GET_PEERS', {
         number: amount
       })
 
+      // When the client receive a message
       response.on('message', (res) => {
+        // if response is equal to "GET_PEERS"
         if (res.response === 'GET_PEERS') {
-          resolve(res.message)
+          resolve(res.message) // return content
         }
       })
     })
   },
   
-  getConnections() {
+  getServerList () {
     return new Promise((resolve, reject) => {
-      
-    })
-  },
-  
-  updateServerList () {
-    return new Promise((resolve, reject) => {
-      
+      // Send "GET_SERVERS" action to the Agora
+      this.send('GET_SERVERS', {})
+
+      // When the client receive a message
+      response.on('message', (res) => {
+        // if response is equal to "GET_SERVERS"
+        if (res.response === 'GET_SERVERS') {
+          resolve(res.message) // return content
+        }
+      })
     })
   }
 }
