@@ -7,7 +7,7 @@ const response = new EventEmitter() // initialize listener
 
 // server for developpement
 const server = {
-  address: 'shuttleapp.io',
+  address: '127.0.0.1',
   port: 2112
 }
 
@@ -63,7 +63,7 @@ const agora = {
       // When the client receive a message
       response.on('message', (res) => {
         // if response is equal to "CONNECT"
-        if (res.response === 'CONNECT') {
+        if (res.message === 'CONNECT') {
           resolve(res.content) // return content
         }
       })
@@ -81,7 +81,7 @@ const agora = {
       // When the client receive a message
       response.on('message', (res) => {
         // if response is equal to "GET_IP"
-        if (res.response === 'GET_IP') {
+        if (res.message === 'GET_IP') {
           resolve(res.content) // return content
         }
       })
@@ -99,7 +99,7 @@ const agora = {
       // When the client receive a message
       response.on('message', (res) => {
         // if response is equal to "GET_PEERS"
-        if (res.response === 'GET_PEERS') {
+        if (res.message === 'GET_PEERS') {
           resolve(res.message) // return content
         }
       })
@@ -114,7 +114,7 @@ const agora = {
       // When the client receive a message
       response.on('message', (res) => {
         // if response is equal to "GET_SERVERS"
-        if (res.response === 'GET_SERVERS') {
+        if (res.message === 'GET_SERVERS') {
           resolve(res.message) // return content
         }
       })
