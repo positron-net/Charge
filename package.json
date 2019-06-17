@@ -18,6 +18,7 @@
   "homepage": "https://github.com/positron-net/Charge#readme",
   "dependencies": {
     "chalk": "^2.4.2",
-    "snappy": "^6.1.2"
+    "snappy": "^6.1.2",
+    "utp-punch": "^1.0.1"
   }
 }

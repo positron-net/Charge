@@ -1,3 +1,4 @@
+/*
 const log = require('./log.js')
 
 const dgram = require('dgram')
@@ -29,4 +30,40 @@ module.exports = (remoteAddress, port) => {
     socket: socket,
     event: events
   }
+}
+*/
+
+////////////////////////////////////////////////////////
+
+const log = require('./log.js')
+const Node = require('utp-punch')
+
+module.exports = (targePort, targeAddress, port) => {
+  return new Promise(resolve => {
+    let receiver = new Node(socket => {
+      log.info('RECEIVER: socket connected')
+    
+      socket.on('data', data => {
+        data = Buffer.from(data).toString()
+        data = JSON.parse(data)
+
+        resolve(data)
+        socket.end()
+      })
+    
+      socket.on('end', () => {
+        log.info('RECEIVER: socket disconnected')
+        receiver.close()
+      })
+    })
+    
+    receiver.bind(port)
+    receiver.listen(() => {
+      receiver.punch(10, targePort, targeAddress, success => {
+        if (success) {
+          log.info('RECEIVER: ready')
+        }
+      })
+    })
+  })
 }

@@ -36,27 +36,33 @@ const files = {
     })
   },
 
-  read (path) {
-    return new Promise((resolve, reject) => {
-      fs.readFile(path, (err, data) => {
-        if (err) {
-          log.error(err)
-          reject(err)
-        } else {
-          resolve(data)
-        }
+  read (type, name) {
+    return new Promise(resolve => {
+      const path = `${__positron}/${type}/${name}`
+  
+      const file = []
+      const reader = fs.createReadStream(path)
+  
+      reader.on('data', (data) => {
+        file.push(data)
+      })
+
+      reader.on('end', () => {
+        resolve(Buffer.concat(file))
       })
     })
   },
 
-  write (path, buffer) {
+  write (type, name, buffer) {
     return new Promise((resolve, reject) => {
+      const path = `${__positron}/${type}/${name}`
+
       fs.writeFile(path, buffer, err => {
         if (err) {
           log.error(err)
           reject(err)
         } else {
-          resolve(data)
+          resolve()
         }
       })
     })
