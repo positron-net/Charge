@@ -24,7 +24,7 @@ checkApp().then(() => {
   console.log(__positron)
 })
 
-exports.mods = {
+module.exports = {
   files: require('./modules/files.js'),
   log: require('./modules/log.js'),
   receiver: require('./modules/receiver.js'),
