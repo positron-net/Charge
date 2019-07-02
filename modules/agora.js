@@ -29,6 +29,7 @@ socket.on('message', (res, remote) => {
 })
 
 const agora = {
+
   // Function to send a message to an agora server
   send (action, content) {
 
@@ -47,6 +48,35 @@ const agora = {
       socket.send(msg, 0, msg.length, server.port, server.address, (err, bytes) => {
         if (err) throw err
         console.log('[AGORA] > Message sent !')
+      })
+    })
+  },
+
+  receive () {
+    return new Promise(resolve => {
+      // When the client receive a message
+      response.on('message', (res) => {
+        // if response is equal to "CONNECT"
+        if (res.message === 'OPEN_LISTENER') {
+          resolve(res.content) // return content
+        }
+      })
+    })
+  },
+
+  openListener (token) {
+    return new Promise(resolve => {
+      // Send "OPEN_LISTENER" message with token and port of the client to the Agora
+      this.send('OPEN_LISTENER', {
+        token: token,
+      })
+
+      // When the client receive a message
+      response.on('message', (res) => {
+        // if response is equal to "SUCCESS"
+        if (res.message === 'SUCCESS') {
+          resolve()
+        }
       })
     })
   },
